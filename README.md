@@ -1,12 +1,10 @@
 # Project Name
 ## Team Information
 ### Team Members
-- Name
-- Name
-- Name
-- Name
-- Name
-- Name
+- Edison Liao
+- Eric Zhu
+- Simon Kim
+- Tokhtar Yessergepov
 ---
 ## Project Description
 ### Domain
