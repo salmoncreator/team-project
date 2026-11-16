@@ -225,174 +225,151 @@ These diagrams are **proposed designs**, not a claim about already implemented J
 
 ### UML Class Diagram
 
-```plantuml
-@startuml
-class Participant {
-  - name: String
-  - results: List<QuizResult>
-  + getName(): String
-  + addResult(result: QuizResult): void
-}
-
-class Question {
-  - questionText: String
-  - answerChoices: List<String>
-  - correctAnswerIndex: int
-  + isCorrect(answerIndex: int): boolean
-}
-
-class Quiz {
-  - id: String
-  - title: String
-  - questions: List<Question>
-  + addQuestion(question: Question): void
-  + removeQuestion(index: int): void
-  + getQuestion(index: int): Question
-  + getQuestionCount(): int
-}
-
-class QuizSession {
-  - participant: Participant
-  - quiz: Quiz
-  - currentQuestionIndex: int
-  - score: int
-  - answers: List<SubmittedAnswer>
-  + submitAnswer(index: int): boolean
-  + isComplete(): boolean
-  + getScore(): int
-}
-
-class QuizResult {
-  - participantName: String
-  - quizId: String
-  - score: int
-  - totalQuestions: int
-  - answers: List<SubmittedAnswer>
-  + getScore(): int
-}
-
-class SubmittedAnswer {
-  - questionIndex: int
-  - selectedAnswerIndex: int
-  - correctAnswerIndex: int
-  + isCorrect(): boolean
-}
-
-Quiz "1" *-- "1..*" Question
-Participant "1" -- "0..*" QuizSession
-Quiz "1" -- "0..*" QuizSession
-QuizSession "1" --> "0..1" QuizResult : produces
-Participant "1" -- "0..*" QuizResult
-QuizSession "1" *-- "0..*" SubmittedAnswer : records
-QuizResult "1" *-- "0..*" SubmittedAnswer : retains
-@enduml
+```mermaid
+classDiagram
+    class Participant {
+        -String name
+        -List~QuizResult~ results
+        +getName() String
+        +addResult(QuizResult result) void
+    }
+    class Question {
+        -String questionText
+        -List~String~ answerChoices
+        -int correctAnswerIndex
+        +isCorrect(int answerIndex) boolean
+    }
+    class Quiz {
+        -String id
+        -String title
+        -List~Question~ questions
+        +addQuestion(Question question) void
+        +removeQuestion(int index) void
+        +getQuestion(int index) Question
+        +getQuestionCount() int
+    }
+    class QuizSession {
+        -Participant participant
+        -Quiz quiz
+        -int currentQuestionIndex
+        -int score
+        -List~SubmittedAnswer~ answers
+        +submitAnswer(int index) boolean
+        +isComplete() boolean
+        +getScore() int
+    }
+    class QuizResult {
+        -String participantName
+        -String quizId
+        -int score
+        -int totalQuestions
+        -List~SubmittedAnswer~ answers
+        +getScore() int
+    }
+    class SubmittedAnswer {
+        -int questionIndex
+        -int selectedAnswerIndex
+        -int correctAnswerIndex
+        +isCorrect() boolean
+    }
+    Quiz "1" *-- "1..*" Question
+    Participant "1" --> "0..*" QuizSession
+    Quiz "1" --> "0..*" QuizSession
+    QuizSession "1" --> "0..1" QuizResult : produces
+    Participant "1" --> "0..*" QuizResult
+    QuizSession "1" --> "0..*" SubmittedAnswer : records
+    QuizResult "1" *-- "0..*" SubmittedAnswer : retains
 ```
 
-The `Quiz` contains questions, each `QuizSession` tracks one participant's attempt at one quiz, and a completed session can produce a `QuizResult`. Persistence and UI classes are omitted from this entity-focused diagram.
 
 ### Sequence Diagram 1: Take Trivia Quiz
 
-```plantuml
-@startuml
-actor "Quiz Taker" as User
-participant "QuizView" as View
-participant "QuizController" as Controller
-participant "QuizInteractor" as Interactor
-participant "QuizSession" as Session
-participant "QuizPresenter" as Presenter
-
-User -> View: Select and submit answer
-View -> Controller: submitAnswer(answerIndex)
-Controller -> Interactor: execute(answerIndex)
-Interactor -> Session: submitAnswer(answerIndex)
-Session --> Interactor: isCorrect
-Interactor -> Session: getScore()
-Session --> Interactor: score
-Interactor -> Presenter: presentUpdatedState(score, progress)
-Presenter -> View: updateDisplay()
-View --> User: Display updated score and progress
-@enduml
+```mermaid
+sequenceDiagram
+    actor User as Quiz Taker
+    participant View as QuizView
+    participant Controller as QuizController
+    participant Interactor as QuizInteractor
+    participant Session as QuizSession
+    participant Presenter as QuizPresenter
+    User->>View: Select and submit answer
+    View->>Controller: submitAnswer(answerIndex)
+    Controller->>Interactor: execute(answerIndex)
+    Interactor->>Session: submitAnswer(answerIndex)
+    Session-->>Interactor: isCorrect
+    Interactor->>Session: getScore()
+    Session-->>Interactor: score
+    Interactor->>Presenter: presentUpdatedState(score, progress)
+    Presenter->>View: updateDisplay()
+    View-->>User: Display updated score and progress
 ```
 
 ### Sequence Diagram 2: Create and Save Trivia Quiz
 
-```plantuml
-@startuml
-actor "Quiz Creator" as Creator
-participant "QuizView" as View
-participant "CreateQuizController" as Controller
-participant "CreateQuizInteractor" as Interactor
-participant "Quiz" as Quiz
-participant "QuizRepository" as Repository
-participant "CreateQuizPresenter" as Presenter
-
-Creator -> View: Submit quiz information
-View -> Controller: createQuiz(title, questions)
-Controller -> Interactor: execute(title, questions)
-create Quiz
-loop For each question
-  Interactor -> Quiz: addQuestion(question)
-end
-Interactor -> Repository: saveQuiz(quiz)
-Repository --> Interactor: Save confirmation
-Interactor -> Presenter: presentSuccess()
-Presenter -> View: updateDisplay()
-View --> Creator: Show confirmation
-@enduml
+```mermaid
+sequenceDiagram
+    actor Creator as Quiz Creator
+    participant View as QuizView
+    participant Controller as CreateQuizController
+    participant Interactor as CreateQuizInteractor
+    participant Quiz as Quiz
+    participant Repository as QuizRepository
+    participant Presenter as CreateQuizPresenter
+    Creator->>View: Submit quiz information
+    View->>Controller: createQuiz(title, questions)
+    Controller->>Interactor: execute(title, questions)
+    loop For each question
+    Interactor->>Quiz: addQuestion(question)
+    end
+    Interactor->>Repository: saveQuiz(quiz)
+    Repository-->>Interactor: Save confirmation
+    Interactor->>Presenter: presentSuccess()
+    Presenter->>View: updateDisplay()
+    View-->>Creator: Show confirmation
 ```
 
-This diagram combines quiz creation and a subsequent save operation for illustration. The written use cases treat creation/editing and saving/loading as separate user goals.
 
 ### Sequence Diagram 3: View Quiz Results
 
-```plantuml
-@startuml
-actor "Quiz Reviewer" as Reviewer
-participant "ResultsView" as View
-participant "ResultsController" as Controller
-participant "ResultsInteractor" as Interactor
-participant "ResultsRepository" as Repository
-participant "ResultsPresenter" as Presenter
-
-Reviewer -> View: Select quiz results
-View -> Controller: viewResults(quizId)
-Controller -> Interactor: execute(quizId)
-Interactor -> Repository: getResults(quizId)
-Repository --> Interactor: List<QuizResult>
-Interactor -> Presenter: presentResults(results)
-Presenter -> View: updateDisplay()
-View --> Reviewer: Display participant scores
-@enduml
+```mermaid
+sequenceDiagram
+    actor Reviewer as Quiz Reviewer
+    participant View as ResultsView
+    participant Controller as ResultsController
+    participant Interactor as ResultsInteractor
+    participant Repository as ResultsRepository
+    participant Presenter as ResultsPresenter
+    Reviewer->>View: Select quiz results
+    View->>Controller: viewResults(quizId)
+    Controller->>Interactor: execute(quizId)
+    Interactor->>Repository: getResults(quizId)
+    Repository-->>Interactor: List<QuizResult>
+    Interactor->>Presenter: presentResults(results)
+    Presenter->>View: updateDisplay()
+    View-->>Reviewer: Display participant scores
 ```
 
 ### Sequence Diagram 4: View Participant Answer Breakdown
 
-```plantuml
-@startuml
-actor "Quiz Reviewer" as Reviewer
-participant "ResultsView" as View
-participant "AnswerDetailsController" as Controller
-participant "AnswerDetailsInteractor" as Interactor
-participant "ResultsRepository" as Repository
-participant "AnswerDetailsPresenter" as Presenter
-
-Reviewer -> View: Select participant name
-View -> Controller: viewAnswerDetails(resultId)
-Controller -> Interactor: execute(resultId)
-Interactor -> Repository: getResult(resultId)
-Repository --> Interactor: QuizResult with submitted answers
-Interactor -> Repository: getQuiz(quizId)
-Repository --> Interactor: Quiz with questions
-Interactor -> Presenter: presentAnswerBreakdown(result, quiz)
-Presenter -> View: updateDisplay()
-View --> Reviewer: Show answers and correctness
-@enduml
+```mermaid
+sequenceDiagram
+    actor Reviewer as Quiz Reviewer
+    participant View as ResultsView
+    participant Controller as AnswerDetailsController
+    participant Interactor as AnswerDetailsInteractor
+    participant Repository as ResultsRepository
+    participant Presenter as AnswerDetailsPresenter
+    Reviewer->>View: Select participant name
+    View->>Controller: viewAnswerDetails(resultId)
+    Controller->>Interactor: execute(resultId)
+    Interactor->>Repository: getResult(resultId)
+    Repository-->>Interactor: QuizResult with submitted answers
+    Interactor->>Repository: getQuiz(quizId)
+    Repository-->>Interactor: Quiz with questions
+    Interactor->>Presenter: presentAnswerBreakdown(result, quiz)
+    Presenter->>View: updateDisplay()
+    View-->>Reviewer: Show answers and correctness
 ```
-
-**Design note:** Each completed attempt needs a stable result identifier so that clicking a participant's name opens the intended attempt, even when names are duplicated or a participant takes the quiz more than once. The storage layer must retain individual submitted answers, not only the total score.
-
-**Design validation:** Before implementation, the team should ensure that every sequence-diagram method exists on the receiving class or interface. The entity class diagram shows only domain classes; controllers, interactors, presenters, and repository interfaces can be added to a more complete architecture diagram later.
-
 ---
 
 ## How to Run
