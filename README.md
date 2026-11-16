@@ -3,7 +3,6 @@
 ## Team Information
 
 ### Team Members
-
 - Edison Liao
 - Eric Zhu
 - Simon Kim
@@ -15,250 +14,172 @@
 
 ### Domain
 
-The Trivia Quiz Program is an interactive application that allows users to create, customize, and participate in trivia
-quizzes. Quiz creators can build quizzes by adding multiple-choice questions, specifying correct answers, and saving
-their quizzes for future use.
-
-Quiz takers can enter their names, select a quiz, and answer questions through a user-friendly interface. During a quiz,
-participants can track their progress and view their current scores. After completing a quiz, participants receive their
-final results.
-
-The application also allows quiz reviewers to view participants' scores and compare their performance.
-
-The goal of this project is to provide an accessible and entertaining platform for testing knowledge while allowing
-users to create and manage their own trivia content.
+The Trivia Quiz Program is an interactive application in which users can create, customize, save, and take multiple-choice trivia quizzes. Quiz takers enter their names, answer questions, monitor their progress and score, and view their final results. Quiz creators can write and edit questions, preview their quizzes, and save them for later use. Quiz reviewers can view participants' results for a selected quiz. The application aims to make trivia accessible, engaging, and easy to manage.
 
 ---
 
 ## User Stories
 
 ### Quiz Taker
-
 1. As a quiz taker, I want to enter my name so that I can compete against other people.
-
-2. As a quiz taker, I want to answer trivia questions through a clean and interactive interface so I can test my
-   knowledge in a fun, low-stakes environment.
-
+2. As a quiz taker, I want to answer trivia questions through a clean and interactive interface so I can test my knowledge in a fun, low-stakes environment.
 3. As a quiz taker, I want to see a progress bar so I know how many questions are left.
-
 4. As a quiz taker, I want to see my score so I know how well I am doing.
 
 ### Quiz Creator
-
 5. As a quiz creator, I want to use a form to create and edit trivia questions so I can build custom quizzes.
-
 6. As a quiz creator, I want to be able to preview my quiz so I can ensure a good experience for my audience.
-
 7. As a quiz creator, I want to save my questions and quizzes so that I can use them later.
 
 ### Quiz Reviewer
-
 8. As a quiz reviewer, I want to view a summary screen showing each participant's score after they complete the quiz.
 
 ---
 
 ## Use Cases
 
-### Use Case 1: Enter Participant Name
+### Use Case 1: Take Trivia Quiz
 
-**Actor:** Quiz Taker
+**Primary actor:** Quiz Taker
 
-**Description:** Allows a participant to enter their name before starting a quiz.
+**Preconditions:**
+- The quiz taker has entered a name.
+- The quiz taker has selected an available quiz containing at least one question.
 
-**Main Flow:**
+**Trigger:** The quiz taker chooses to start the selected quiz.
 
-1. The user opens the application.
-2. The user enters their name.
-3. The application validates the input.
-4. The application stores the participant's name for the current quiz session.
-5. The user proceeds to quiz selection.
+**Success outcome:** All questions have been answered, the final score is displayed, and the result is recorded.
 
-**Expected Outcome:** The participant's name is associated with their quiz results.
+**Main success scenario:**
+1. The quiz taker starts the selected quiz.
+2. The system displays the first question and its possible answers.
+3. The quiz taker selects and submits an answer.
+4. The system checks the answer and updates the score.
+5. The system updates the progress indicator and, if questions remain, displays the next question.
+6. Steps 3–5 repeat until all questions have been answered.
+7. The system displays the final score.
+8. The system records the quiz result.
 
-### Use Case 2: Take Trivia Quiz
+**Extensions:**
+- **3a. No answer is selected:** The system requests a selection and keeps the current question visible; the quiz taker can retry.
+- **4a. The answer is incorrect:** The score does not increase; the quiz continues.
+- **8a. Results cannot be recorded:** The system reports the failure and keeps the final score visible.
 
-**Actor:** Quiz Taker
+### Use Case 2: Create and Edit Trivia Quiz
 
-**Description:** Allows participants to answer multiple-choice trivia questions.
+**Primary actor:** Quiz Creator
 
-**Main Flow:**
+**Preconditions:** The quiz creator has access to the quiz creation or editing feature.
 
-1. The participant selects an available quiz.
-2. The application displays the first question and its answer choices.
-3. The participant selects an answer.
-4. The application checks whether the answer is correct.
-5. The application updates the participant's score and progress bar.
-6. The process repeats until all questions have been answered.
-7. The application displays the final score.
+**Trigger:** The creator chooses to create a new quiz or edit an existing quiz.
 
-**Expected Outcome:** The participant completes the quiz and receives their results.
+**Success outcome:** A valid quiz is created or updated and is available for saving.
 
-### Use Case 3: Create and Edit Quiz
+**Main success scenario:**
+1. The creator requests to create or edit a quiz.
+2. The system displays the quiz's current information or an empty quiz form.
+3. The creator enters or updates the quiz title.
+4. The creator enters a question and its possible answers.
+5. The creator identifies the correct answer.
+6. The system validates the question information.
+7. The creator repeats steps 4–6 as needed.
+8. The creator confirms the changes.
+9. The system makes the created or updated quiz available for saving.
 
-**Actor:** Quiz Creator
+**Extensions:**
+- **6a. Required question information is missing:** The system identifies the problem and allows the creator to correct it.
+- **7a. The creator edits an existing question:** The system displays the question's information, accepts revisions, and validates them.
+- **8a. The quiz contains no questions:** The system asks the creator to add at least one question before confirming.
 
-**Description:** Allows users to create and modify custom trivia quizzes.
+### Use Case 3: Save and Load Trivia Quiz
 
-**Main Flow:**
+**Primary actor:** Quiz Creator
 
-1. The creator selects the option to create a quiz.
-2. The creator enters a quiz title.
-3. The creator adds questions using an input form.
-4. Each question includes answer choices and a designated correct answer.
-5. The creator can edit or remove questions.
-6. The creator saves the completed quiz.
+**Preconditions:** The creator can access the application's quiz storage; saving additionally requires a selected quiz.
 
-**Expected Outcome:** A new or updated quiz is available for participants.
+**Trigger:** The creator requests to save a quiz or retrieve a saved quiz.
 
-### Use Case 4: Preview Quiz
+**Success outcome:** The quiz is saved for future use or a previously saved quiz is retrieved.
 
-**Actor:** Quiz Creator
+**Main success scenario — Save:**
+1. The creator requests to save a selected quiz.
+2. The system validates the quiz.
+3. The system stores the quiz and its questions.
+4. The system confirms that the quiz was saved.
 
-**Description:** Allows creators to preview quizzes before making them available.
+**Main success scenario — Load:**
+1. The creator requests to view saved quizzes.
+2. The system displays the available quizzes.
+3. The creator selects a quiz.
+4. The system retrieves the selected quiz.
+5. The system displays it for viewing or editing.
 
-**Main Flow:**
+**Extensions:**
+- **Save 2a. Invalid quiz:** The system identifies the validation errors and allows corrections.
+- **Save 3a. Storage failure:** The system reports that saving failed; the current quiz remains available in the session.
+- **Load 2a. No saved quizzes:** The system informs the creator that none are available.
+- **Load 4a. Retrieval failure:** The system reports the error and allows another selection.
 
-1. The creator selects an existing or newly created quiz.
-2. The creator clicks the preview option.
-3. The application displays the quiz as it would appear to a participant.
-4. The creator navigates through the questions.
-5. The creator returns to the editing interface to make changes if necessary.
+### Use Case 4: View Quiz Results
 
-**Expected Outcome:** The creator can verify the quiz's content and presentation before use.
+**Primary actor:** Quiz Reviewer
 
-### Use Case 5: Save and Load Quizzes
+**Preconditions:** At least one completed quiz result has been recorded.
 
-**Actor:** Quiz Creator
+**Trigger:** The reviewer requests to view results.
 
-**Description:** Allows users to save quizzes and retrieve them later.
+**Success outcome:** The reviewer sees participants' names and scores for the selected quiz.
 
-**Main Flow:**
+**Main success scenario:**
+1. The reviewer opens the results feature.
+2. The system displays quizzes with recorded results.
+3. The reviewer selects a quiz.
+4. The system retrieves the associated results.
+5. The system displays each participant's name, score, and total number of questions.
+6. The reviewer compares participants' performances.
 
-1. The creator finishes creating or editing a quiz.
-2. The creator selects the save option.
-3. The application stores the quiz and its questions in persistent storage.
-4. When the application is reopened, previously saved quizzes are loaded.
-5. The creator can select a saved quiz to edit or preview.
-
-**Expected Outcome:** Quizzes remain available between application sessions.
-
-### Use Case 6: View Quiz Results
-
-**Actor:** Quiz Reviewer
-
-**Description:** Allows reviewers to examine participants' quiz performances.
-
-**Main Flow:**
-
-1. A participant completes a quiz.
-2. The application records the participant's name and score.
-3. The reviewer opens the results screen.
-4. The application displays the participants and their scores.
-5. The reviewer can compare participants' performances.
-
-**Expected Outcome:** Quiz results are displayed in an organized summary.
+**Extensions:**
+- **4a. No results for the selected quiz:** The system explains that no results are available and allows another selection.
+- **4b. Results cannot be retrieved:** The system displays an error and offers a retry.
 
 ---
 
 ## Minimal Viable Product (MVP)
 
-The MVP will focus on implementing the core functionality needed to create, take, and review trivia quizzes. Each team
-member will be responsible for implementing one primary use case.
+The MVP focuses on the four core use cases. The following responsibilities are proposed and should be confirmed by the team.
 
-| Team Member         | MVP Use Case          |
-|---------------------|-----------------------|
-| Edison Liao         | Create and Edit Quiz  |
-| Eric Zhu            | Take Trivia Quiz      |
-| Simon Kim           | Save and Load Quizzes |
-| Tokhtar Yessergepov | View Quiz Results     |
+| Team Member | MVP Use Case |
+|-------------|--------------|
+| Edison Liao | Create and Edit Trivia Quiz |
+| Eric Zhu | Take Trivia Quiz |
+| Simon Kim | Save and Load Trivia Quiz |
+| Tokhtar Yessergepov | View Quiz Results |
 
-Additional functionality, such as quiz previews, progress bars, and improved interface design, can be integrated as the
-project develops.
-
-*Note: These responsibilities are proposed and can be adjusted based on the team's preferences.*
+Name entry, progress indicators, quiz preview, and interface refinements support these primary use cases and may be developed as integrated features.
 
 ---
 
 ## Entities
 
 ### Entity 1: Participant
-
-**Description:** Represents a user who participates in trivia quizzes.
-
-**Attributes:**
-
-- `name`: The participant's name.
-- `results`: A collection of the participant's completed quiz results.
-
-**Responsibilities:**
-
-- Store participant information.
-- Associate participants with their quiz results.
+- **Attributes:** `name: String`, `results: List<QuizResult>`
+- **Responsibilities:** Store participant identity and associate completed results with the participant.
 
 ### Entity 2: Question
-
-**Description:** Represents an individual multiple-choice trivia question.
-
-**Attributes:**
-
-- `questionText`: The text of the question.
-- `answerChoices`: A list of possible answers.
-- `correctAnswerIndex`: The index of the correct answer.
-
-**Responsibilities:**
-
-- Store question content and possible answers.
-- Determine whether a selected answer is correct.
+- **Attributes:** `questionText: String`, `answerChoices: List<String>`, `correctAnswerIndex: int`
+- **Responsibilities:** Store the question and determine whether a submitted answer is correct.
 
 ### Entity 3: Quiz
-
-**Description:** Represents a collection of trivia questions.
-
-**Attributes:**
-
-- `title`: The name of the quiz.
-- `questions`: A collection of Question objects.
-- `id`: A unique identifier for the quiz.
-
-**Responsibilities:**
-
-- Manage the collection of questions.
-- Support adding, removing, and editing questions.
-- Provide questions to active quiz sessions.
+- **Attributes:** `id: String`, `title: String`, `questions: List<Question>`
+- **Responsibilities:** Manage questions and provide access to quiz content.
 
 ### Entity 4: QuizSession
-
-**Description:** Represents a participant's attempt at completing a quiz.
-
-**Attributes:**
-
-- `participant`: The participant taking the quiz.
-- `quiz`: The selected quiz.
-- `currentQuestionIndex`: The current question number.
-- `score`: The number of correctly answered questions.
-
-**Responsibilities:**
-
-- Track quiz progress.
-- Process submitted answers.
-- Calculate and update scores.
-- Determine when the quiz is complete.
+- **Attributes:** `participant: Participant`, `quiz: Quiz`, `currentQuestionIndex: int`, `score: int`
+- **Responsibilities:** Track an active attempt, evaluate submitted answers, update score and progress, and determine completion.
 
 ### Entity 5: QuizResult
-
-**Description:** Represents the outcome of a completed quiz session.
-
-**Attributes:**
-
-- `participantName`: The participant's name.
-- `quizId`: The identifier of the completed quiz.
-- `score`: The number of correct answers.
-- `totalQuestions`: The total number of questions.
-
-**Responsibilities:**
-
-- Store completed quiz results.
-- Provide information for the results summary screen.
+- **Attributes:** `participantName: String`, `quizId: String`, `score: int`, `totalQuestions: int`
+- **Responsibilities:** Represent the outcome of a completed quiz for display and storage.
 
 ---
 
@@ -268,128 +189,164 @@ project develops.
 
 **Documentation:** https://opentdb.com/api_config.php
 
-**How it is used in the program:**
-
-The Open Trivia Database API can be used to retrieve additional trivia questions from an external source.
-
-The application can send HTTP requests to retrieve multiple-choice questions based on categories, difficulty levels, and
-the desired number of questions.
-
-For example:
-
-`https://opentdb.com/api.php?amount=10&type=multiple`
-
-This request retrieves 10 multiple-choice trivia questions.
-
-The retrieved questions can be converted into Question entities and added to quizzes within the application.
-
-The API will supplement the custom quiz creation functionality rather than replace it. Users will still be able to
-create their own questions manually.
+**How it is used in the program:** The API is a proposed optional source of multiple-choice trivia questions. For example, `https://opentdb.com/api.php?amount=10&type=multiple` requests ten multiple-choice questions. The application can convert API responses into `Question` objects. Manual quiz creation remains supported, and the core MVP need not depend on internet access.
 
 ---
 
 ## Design Diagrams
 
+
 ### UML Class Diagram
 
-The UML class diagram will illustrate the relationships between the main entities and the classes responsible for
-application functionality.
+```plantuml
+@startuml
+class Participant {
+  - name: String
+  - results: List<QuizResult>
+  + getName(): String
+  + addResult(result: QuizResult): void
+}
 
-The proposed design includes:
+class Question {
+  - questionText: String
+  - answerChoices: List<String>
+  - correctAnswerIndex: int
+  + isCorrect(answerIndex: int): boolean
+}
 
-- **Participant:** Stores participant information.
-- **Question:** Represents individual trivia questions.
-- **Quiz:** Contains a collection of questions.
-- **QuizSession:** Tracks an active quiz attempt.
-- **QuizResult:** Stores completed quiz results.
-- **QuizRepository:** Handles saving and loading quizzes.
-- **QuizInteractor:** Coordinates the quiz-taking use case.
-- **QuizController:** Receives user input from the interface.
+class Quiz {
+  - id: String
+  - title: String
+  - questions: List<Question>
+  + addQuestion(question: Question): void
+  + removeQuestion(index: int): void
+  + getQuestion(index: int): Question
+  + getQuestionCount(): int
+}
 
-The design will follow Clean Architecture principles by separating entities, use cases, interface adapters, and external
-infrastructure.
+class QuizSession {
+  - participant: Participant
+  - quiz: Quiz
+  - currentQuestionIndex: int
+  - score: int
+  + submitAnswer(index: int): boolean
+  + isComplete(): boolean
+  + getScore(): int
+}
 
-### Sequence Diagrams
+class QuizResult {
+  - participantName: String
+  - quizId: String
+  - score: int
+  - totalQuestions: int
+  + getScore(): int
+}
 
-The following sequence diagrams will be created:
+Quiz "1" *-- "1..*" Question
+Participant "1" -- "0..*" QuizSession
+Quiz "1" -- "0..*" QuizSession
+QuizSession "1" --> "0..1" QuizResult : produces
+Participant "1" -- "0..*" QuizResult
+@enduml
+```
 
-**1. Take Trivia Quiz**
 
-- Participant selects an answer.
-- View sends the selected answer to the controller.
-- Controller invokes the quiz interactor.
-- Interactor updates the quiz session.
-- Presenter prepares the updated score and progress.
-- View displays the next question.
+### Sequence Diagram 1: Take Trivia Quiz
 
-**2. Create Quiz**
+```plantuml
+@startuml
+actor "Quiz Taker" as User
+participant "QuizView" as View
+participant "QuizController" as Controller
+participant "QuizInteractor" as Interactor
+participant "QuizSession" as Session
+participant "QuizPresenter" as Presenter
 
-- Creator enters quiz information.
-- View sends the information to the controller.
-- Controller invokes the quiz creation interactor.
-- Interactor creates or updates the Quiz entity.
-- Repository saves the quiz.
-- Presenter communicates the outcome to the view.
+User -> View: Select and submit answer
+View -> Controller: submitAnswer(answerIndex)
+Controller -> Interactor: execute(answerIndex)
+Interactor -> Session: submitAnswer(answerIndex)
+Session --> Interactor: isCorrect
+Interactor -> Session: getScore()
+Session --> Interactor: score
+Interactor -> Presenter: presentUpdatedState(score, progress)
+Presenter -> View: updateDisplay()
+View --> User: Display updated score and progress
+@enduml
+```
 
-**3. View Quiz Results**
+### Sequence Diagram 2: Create and Save Trivia Quiz
 
-- Reviewer requests the results summary.
-- Controller invokes the results interactor.
-- Interactor retrieves stored results.
-- Presenter formats participant names and scores.
-- View displays the results summary.
+```plantuml
+@startuml
+actor "Quiz Creator" as Creator
+participant "QuizView" as View
+participant "CreateQuizController" as Controller
+participant "CreateQuizInteractor" as Interactor
+participant "Quiz" as Quiz
+participant "QuizRepository" as Repository
+participant "CreateQuizPresenter" as Presenter
+
+Creator -> View: Submit quiz information
+View -> Controller: createQuiz(title, questions)
+Controller -> Interactor: execute(title, questions)
+create Quiz
+loop For each question
+  Interactor -> Quiz: addQuestion(question)
+end
+Interactor -> Repository: saveQuiz(quiz)
+Repository --> Interactor: Save confirmation
+Interactor -> Presenter: presentSuccess()
+Presenter -> View: updateDisplay()
+View --> Creator: Show confirmation
+@enduml
+```
+
+
+### Sequence Diagram 3: View Quiz Results
+
+```plantuml
+@startuml
+actor "Quiz Reviewer" as Reviewer
+participant "ResultsView" as View
+participant "ResultsController" as Controller
+participant "ResultsInteractor" as Interactor
+participant "ResultsRepository" as Repository
+participant "ResultsPresenter" as Presenter
+
+Reviewer -> View: Select quiz results
+View -> Controller: viewResults(quizId)
+Controller -> Interactor: execute(quizId)
+Interactor -> Repository: getResults(quizId)
+Repository --> Interactor: List<QuizResult>
+Interactor -> Presenter: presentResults(results)
+Presenter -> View: updateDisplay()
+View --> Reviewer: Display participant scores
+@enduml
+```
+
+**Design validation:** Before implementation, the team should ensure that every sequence-diagram method exists on the receiving class or interface. The entity class diagram shows only domain classes; controllers, interactors, presenters, and repository interfaces can be added to a more complete architecture diagram later.
 
 ---
 
 ## How to Run
 
-*Proposed instructions for the Java application; update these once the implementation is finalized.*
+*To be finalized once the application is implemented.*
 
-1. Clone the project's GitHub repository.
-2. Open the project in IntelliJ IDEA.
-3. Ensure the required Java Development Kit (JDK) is installed and configured.
-4. Install or configure any required dependencies.
-5. Run the application's main class.
-6. Use the graphical interface to create a quiz, take a quiz, or view results.
+1. Clone the team's GitHub repository.
+2. Open the Java project in IntelliJ IDEA.
+3. Configure the required JDK and project dependencies.
+4. Run the application's main class.
+5. Use the interface to create or load quizzes, take a quiz, and review results.
 
-An internet connection may be required when retrieving questions from the Open Trivia Database API. Locally saved
-quizzes should remain accessible without an internet connection.
+Internet access may be required for optional OpenTDB question retrieval; locally saved quizzes should be usable offline.
 
 ---
 
 ## Notes
 
-### Architecture
-
-The project will follow Clean Architecture principles to separate business logic from user interface and data storage
-implementations.
-
-The application will be organized into the following layers:
-
-- **Entities:** Core domain objects such as Quiz, Question, Participant, QuizSession, and QuizResult.
-- **Use Cases:** Application-specific operations such as creating quizzes, submitting answers, and viewing results.
-- **Interface Adapters:** Controllers, presenters, and view models that connect the interface to the use cases.
-- **Frameworks and Drivers:** Graphical user interface, file storage, and external API integration.
-
-### Data Persistence
-
-Quiz data and participant results will be saved using local file storage, potentially in JSON format. This allows users
-to retrieve their quizzes and results after restarting the application.
-
-### Potential Extensions
-
-If time permits, the team may implement additional features such as:
-
-- Difficulty levels and question categories.
-- A leaderboard ranking participants by score.
-- Timed trivia questions.
-- Randomized question order.
-- Importing trivia questions from the Open Trivia Database API.
-
-### Testing
-
-Unit tests will be written for core entities and use cases, including answer validation, score calculation, question
-management, and result storage.
-
-The team will also test interactions between controllers, interactors, presenters, and data access components to verify
-that the application behaves correctly.
+- **Architecture:** The team plans to follow Clean Architecture by separating entities, use-case interactors, controllers, presenters, and infrastructure.
+- **Persistence:** Local JSON storage is a proposed option for quizzes and results; the exact implementation remains to be decided.
+- **Testing:** Unit tests should cover answer checking, score updates, quiz validation, and result retrieval. Use-case tests should also cover the documented extensions and failures.
+- **Possible extensions:** Timed questions, difficulty levels, randomized question order, leaderboard rankings, and API-based question import.
+- **Open decisions:** Confirm team responsibilities, final storage format, interface technology, and which optional features fit the project timeline.
