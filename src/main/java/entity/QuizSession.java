@@ -3,11 +3,11 @@ package entity;
 import java.util.List;
 
 public class QuizSession {
-    private Participant participant;
-    private Quiz quiz;
-    private int currentQuestionIndex;
-    private int score;
-    private List<SubmittedAnswer> answers;
+    private final Participant participant;
+    private final Quiz quiz;
+    private final int currentQuestionIndex;
+    private final int score;
+    private final List<SubmittedAnswer> answers;
 
     public QuizSession(Participant participant, Quiz quiz, int currentQuestionIndex, int score, List<SubmittedAnswer> answers) {
         this.participant = participant;
