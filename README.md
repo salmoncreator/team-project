@@ -30,10 +30,12 @@ The Trivia Quiz Program is an interactive application in which users can create,
 5. As a quiz creator, I want to use a form to create and edit trivia questions so I can build custom quizzes.
 6. As a quiz creator, I want to be able to preview my quiz so I can ensure a good experience for my audience.
 7. As a quiz creator, I want to save my questions and quizzes so that I can use them later.
+8. As a quiz creator, I want to generate a quiz from an online trivia database by choosing a category, difficulty, and number of questions, so I can make a quiz quickly without writing every question myself.
 
 ### Quiz Reviewer
-8. As a quiz reviewer, I want to view a summary screen showing each participant's score after they complete the quiz.
-9. As a quiz reviewer, I want to click on a participant’s name to see a detailed breakdown of their answers and which ones were correct.
+9. As a quiz reviewer, I want to view a summary screen showing each participant's score after they complete the quiz.
+10. As a quiz reviewer, I want to click on a participant’s name to see a detailed breakdown of their answers and which ones were correct.
+11. As a quiz reviewer, I want to view a summary screen showing each participant's score after they complete the quiz.
 
 ---
 
@@ -92,34 +94,29 @@ The Trivia Quiz Program is an interactive application in which users can create,
 - **7a. The creator edits an existing question:** The system displays the question's information, accepts revisions, and validates them.
 - **8a. The quiz contains no questions:** The system asks the creator to add at least one question before confirming.
 
-### Use Case 3: Save and Load Trivia Quiz
+### Use Case 3: Generate Quiz from Online Trivia Database
 
 **Primary actor:** Quiz Creator
 
-**Preconditions:** The creator can access the application's quiz storage; saving additionally requires a selected quiz.
+**Preconditions:** The application has an internet connection.
 
-**Trigger:** The creator requests to save a quiz or retrieve a saved quiz.
+**Trigger:** The creator chooses to generate a quiz from the online trivia database.
 
-**Success outcome:** The quiz is saved for future use or a previously saved quiz is retrieved.
+**Success outcome:** A new quiz made of questions from the online database is saved and available to quiz takers.
 
-**Main success scenario — Save:**
-1. The creator requests to save a selected quiz.
-2. The system validates the quiz.
-3. The system stores the quiz and its questions.
-4. The system confirms that the quiz was saved.
-
-**Main success scenario — Load:**
-1. The creator requests to view saved quizzes.
-2. The system displays the available quizzes.
-3. The creator selects a quiz.
-4. The system retrieves the selected quiz.
-5. The system displays it for viewing or editing.
+**Main success scenario:**
+1. The creator requests to generate a quiz.
+2. The system displays the trivia categories available from the online database.
+3. The creator selects a category, a difficulty, and the number of questions, and enters a quiz title.
+4. The system retrieves matching questions from the online database and creates the quiz.
+5. The system displays the generated questions.
+6. The creator confirms the quiz.
+7. The system saves the quiz and confirms it was saved.
 
 **Extensions:**
-- **Save 2a. Invalid quiz:** The system identifies the validation errors and allows corrections.
-- **Save 3a. Storage failure:** The system reports that saving failed; the current quiz remains available in the session.
-- **Load 2a. No saved quizzes:** The system informs the creator that none are available.
-- **Load 4a. Retrieval failure:** The system reports the error and allows another selection.
+- **2a. The online database cannot be reached:** The system reports that it cannot connect and returns to the main menu; no quiz is created.
+- **4a. Not enough questions are available for the selected options:** The system reports how many are available and lets the creator continue with fewer questions or change the options.
+- **6a. The creator discards the quiz:** The generated quiz is not saved.
 
 ### Use Case 4: View Quiz Results
 
@@ -174,9 +171,10 @@ The MVP focuses on the four original core use cases. The participant answer brea
 |-------------|--------------|
 | Edison Liao | Create and Edit Trivia Quiz |
 | Eric Zhu | Take Trivia Quiz |
-| Simon Kim | Save and Load Trivia Quiz |
+| Simon Kim | Generate Quiz from Online Trivia Database |
 | Tokhtar Yessergepov | View Quiz Results |
 
+Saving and loading quizzes and results is shared data-access code used by all use cases and will be agreed on by the whole team.
 Name entry, progress indicators, quiz preview, and interface refinements support these primary use cases and may be developed as integrated features.
 
 ---
@@ -215,10 +213,30 @@ Name entry, progress indicators, quiz preview, and interface refinements support
 
 **Documentation:** https://opentdb.com/api_config.php
 
-**How it is used in the program:** The API is a proposed optional source of multiple-choice trivia questions. For example, `https://opentdb.com/api.php?amount=10&type=multiple` requests ten multiple-choice questions. The application can convert API responses into `Question` objects. Manual quiz creation remains supported, and the core MVP need not depend on internet access.
+**Used by:** Use Case 3 (Generate Quiz from Online Trivia Database)
 
+**How it is used in the program:**
+
+The quiz creator can generate a quiz by choosing a category, a difficulty, and a number of questions. The application uses three OpenTDB endpoints:
+
+| Purpose | Endpoint |
+|---|---|
+| Get the list of categories to show the quiz creator | `https://opentdb.com/api_category.php` |
+| Get multiple-choice questions matching the creator's choices | `https://opentdb.com/api.php?amount=10&category=9&difficulty=easy&type=multiple` |
+| Get a session token so repeated generations do not return duplicate questions | `https://opentdb.com/api_token.php?command=request` |
+
+**Handling the response:**
+
+- Each result contains a question, one correct answer, and three incorrect answers. These are converted into the application's own `Question` entities by an adapter class, so no other part of the application depends on the API's data format.
+- The `response_code` field is checked to detect problems, such as too few questions being available for the selected options (Use Case 3, extension 4a).
+- Question text is returned HTML-encoded (for example `&quot;`), so it is decoded before being shown to the user.
+
+**Constraints:**
+
+- No API key is required.
+- OpenTDB allows one request every 5 seconds per IP address, so the application makes one question request per generated quiz.
+- An internet connection is required only for generating quizzes. Saved quizzes and results remain available offline.
 ---
-
 ## Design Diagrams
 
 These diagrams are **proposed designs**, not a claim about already implemented Java classes. In keeping with Chapter 8, the class diagram shows structure, while each sequence diagram traces a specific scenario through object interactions. The use cases above intentionally avoid prescribing implementation details.
