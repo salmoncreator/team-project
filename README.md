@@ -33,6 +33,7 @@ The Trivia Quiz Program is an interactive application in which users can create,
 
 ### Quiz Reviewer
 8. As a quiz reviewer, I want to view a summary screen showing each participant's score after they complete the quiz.
+9. As a quiz reviewer, I want to click on a participant’s name to see a detailed breakdown of their answers and which ones were correct.
 
 ---
 
@@ -142,11 +143,32 @@ The Trivia Quiz Program is an interactive application in which users can create,
 - **4a. No results for the selected quiz:** The system explains that no results are available and allows another selection.
 - **4b. Results cannot be retrieved:** The system displays an error and offers a retry.
 
+### Use Case 5: View Participant Answer Breakdown
+
+**Primary actor:** Quiz Reviewer
+
+**Preconditions:** The reviewer is viewing results for a quiz, and at least one participant has a recorded result with individual answers.
+
+**Trigger:** The reviewer selects a participant's name from the results summary.
+
+**Success outcome:** The reviewer sees each question, the participant's submitted answer, the correct answer, and whether the submission was correct.
+
+**Main success scenario:**
+1. The reviewer selects a participant's name from the results summary.
+2. The system retrieves that participant's recorded answers for the selected quiz attempt.
+3. The system displays each question alongside the participant's answer and the correct answer.
+4. The system indicates which answers were correct and which were incorrect.
+5. The reviewer examines the breakdown and can return to the results summary.
+
+**Extensions:**
+- **2a. Answer details are unavailable:** The system explains that the detailed breakdown is unavailable while retaining the participant's summary score.
+- **2b. Details cannot be retrieved:** The system displays an error and allows the reviewer to retry or return to the summary.
+
 ---
 
 ## Minimal Viable Product (MVP)
 
-The MVP focuses on the four core use cases. The following responsibilities are proposed and should be confirmed by the team.
+The MVP focuses on the four original core use cases. The participant answer breakdown (Use Case 5) extends results review and can be integrated with that feature. The following responsibilities are proposed and should be confirmed by the team.
 
 | Team Member | MVP Use Case |
 |-------------|--------------|
@@ -174,12 +196,16 @@ Name entry, progress indicators, quiz preview, and interface refinements support
 - **Responsibilities:** Manage questions and provide access to quiz content.
 
 ### Entity 4: QuizSession
-- **Attributes:** `participant: Participant`, `quiz: Quiz`, `currentQuestionIndex: int`, `score: int`
+- **Attributes:** `participant: Participant`, `quiz: Quiz`, `currentQuestionIndex: int`, `score: int`, `answers: List<SubmittedAnswer>`
 - **Responsibilities:** Track an active attempt, evaluate submitted answers, update score and progress, and determine completion.
 
 ### Entity 5: QuizResult
-- **Attributes:** `participantName: String`, `quizId: String`, `score: int`, `totalQuestions: int`
-- **Responsibilities:** Represent the outcome of a completed quiz for display and storage.
+- **Attributes:** `participantName: String`, `quizId: String`, `score: int`, `totalQuestions: int`, `answers: List<SubmittedAnswer>`
+- **Responsibilities:** Represent the outcome of a completed quiz, including its per-question answers, for display and storage.
+
+### Entity 6: SubmittedAnswer
+- **Attributes:** `questionIndex: int`, `selectedAnswerIndex: int`, `correctAnswerIndex: int`
+- **Responsibilities:** Preserve a participant’s answer to a particular question and determine whether it was correct. The corresponding question text and answer choices can be retrieved from the saved quiz.
 
 ---
 
@@ -195,6 +221,7 @@ Name entry, progress indicators, quiz preview, and interface refinements support
 
 ## Design Diagrams
 
+These diagrams are **proposed designs**, not a claim about already implemented Java classes. In keeping with Chapter 8, the class diagram shows structure, while each sequence diagram traces a specific scenario through object interactions. The use cases above intentionally avoid prescribing implementation details.
 
 ### UML Class Diagram
 
@@ -229,6 +256,7 @@ class QuizSession {
   - quiz: Quiz
   - currentQuestionIndex: int
   - score: int
+  - answers: List<SubmittedAnswer>
   + submitAnswer(index: int): boolean
   + isComplete(): boolean
   + getScore(): int
@@ -239,7 +267,15 @@ class QuizResult {
   - quizId: String
   - score: int
   - totalQuestions: int
+  - answers: List<SubmittedAnswer>
   + getScore(): int
+}
+
+class SubmittedAnswer {
+  - questionIndex: int
+  - selectedAnswerIndex: int
+  - correctAnswerIndex: int
+  + isCorrect(): boolean
 }
 
 Quiz "1" *-- "1..*" Question
@@ -247,9 +283,12 @@ Participant "1" -- "0..*" QuizSession
 Quiz "1" -- "0..*" QuizSession
 QuizSession "1" --> "0..1" QuizResult : produces
 Participant "1" -- "0..*" QuizResult
+QuizSession "1" *-- "0..*" SubmittedAnswer : records
+QuizResult "1" *-- "0..*" SubmittedAnswer : retains
 @enduml
 ```
 
+The `Quiz` contains questions, each `QuizSession` tracks one participant's attempt at one quiz, and a completed session can produce a `QuizResult`. Persistence and UI classes are omitted from this entity-focused diagram.
 
 ### Sequence Diagram 1: Take Trivia Quiz
 
@@ -302,6 +341,7 @@ View --> Creator: Show confirmation
 @enduml
 ```
 
+This diagram combines quiz creation and a subsequent save operation for illustration. The written use cases treat creation/editing and saving/loading as separate user goals.
 
 ### Sequence Diagram 3: View Quiz Results
 
@@ -324,6 +364,32 @@ Presenter -> View: updateDisplay()
 View --> Reviewer: Display participant scores
 @enduml
 ```
+
+### Sequence Diagram 4: View Participant Answer Breakdown
+
+```plantuml
+@startuml
+actor "Quiz Reviewer" as Reviewer
+participant "ResultsView" as View
+participant "AnswerDetailsController" as Controller
+participant "AnswerDetailsInteractor" as Interactor
+participant "ResultsRepository" as Repository
+participant "AnswerDetailsPresenter" as Presenter
+
+Reviewer -> View: Select participant name
+View -> Controller: viewAnswerDetails(resultId)
+Controller -> Interactor: execute(resultId)
+Interactor -> Repository: getResult(resultId)
+Repository --> Interactor: QuizResult with submitted answers
+Interactor -> Repository: getQuiz(quizId)
+Repository --> Interactor: Quiz with questions
+Interactor -> Presenter: presentAnswerBreakdown(result, quiz)
+Presenter -> View: updateDisplay()
+View --> Reviewer: Show answers and correctness
+@enduml
+```
+
+**Design note:** Each completed attempt needs a stable result identifier so that clicking a participant's name opens the intended attempt, even when names are duplicated or a participant takes the quiz more than once. The storage layer must retain individual submitted answers, not only the total score.
 
 **Design validation:** Before implementation, the team should ensure that every sequence-diagram method exists on the receiving class or interface. The entity class diagram shows only domain classes; controllers, interactors, presenters, and repository interfaces can be added to a more complete architecture diagram later.
 
