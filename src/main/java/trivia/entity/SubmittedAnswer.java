@@ -1,6 +1,7 @@
-package entity;
+package trivia.entity;
 
-public class SubmittedAnswer {
+/** One participant's answer, using zero-based question and choice indexes. */
+public final class SubmittedAnswer {
     private final int questionIndex;
     private final int selectedAnswerIndex;
     private final int correctAnswerIndex;
@@ -21,5 +22,9 @@ public class SubmittedAnswer {
 
     public int getCorrectAnswerIndex() {
         return correctAnswerIndex;
+    }
+
+    public boolean isCorrect() {
+        return selectedAnswerIndex == correctAnswerIndex;
     }
 }
